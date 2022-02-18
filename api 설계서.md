@@ -95,14 +95,10 @@ PUT /users/<string:user_id>
 ```json
 {
    "name":"String",    
-   "position": "String",
    "school":"String",
    "grade": "INT",
    "classes": "INT",
-   "number": "INT",   
-   "password": "String",
-   "email": "String",
-   "birth": "DATE"
+   "number": "INT",
 }
 ```
 - Response
