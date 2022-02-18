@@ -1,8 +1,12 @@
 # API 명세서
 - ### 기본 포트 : http://localhost:9999/api/v1
-[회원](#회원)  
-[게시판](#게시판)  
-[화상회의](#화상회의)
+  [회원](#회원)  
+  [시간표](#시간표)  
+  [게시판](#게시판)  
+  [화상회의](#화상회의)
+
+
+
 ## 회원  
 
 ### 회원가입
@@ -35,7 +39,7 @@ FAIL {
     "code": 500, "message": "서버 오류"
 }
 ```
-  
+
 ### 로그인
 - URL
 ```
@@ -59,7 +63,7 @@ FAIL {
     "code": 500, "message": "Server Error",
     "code": 401, "message": "유효하지 않은 password"
 }
-```  
+```
 
 ### 내 프로필
 -  URL
@@ -127,7 +131,7 @@ FAIL {
     "code": 500, "message": "Server Error",
     "code": 401, "message": "본인의 ID가 아닙니다."
 }
-```  
+```
 ### 회원 ID 가져오기  
 - URL
 ```
@@ -143,408 +147,1141 @@ SUCCESS{ "userId" : "String"}
 FAIL {
     "code": 403, "error" : "Forbidden", "message": "Access Denied."
 }
-``` 
-## 게시판
+```
 ---
+## 시간표
+
+### 일주일 시간표 보기
+
+- URL
+  - Date에 월요일 날짜를 주세요.
+
+```
+GET /timetable/week?<string:school>&<int:grade>&<int:classes>&<date:date>
+```
+
+- Request
+
+```
+X
+```
+
+- Response
+
+
+``` json
+SUCCESS{
+    [
+        {
+            "id": 608,
+            "subject": "국어",
+            "startTime": "09:00",
+            "endTime": "09:40",
+            "day": "월"
+        },
+        {
+            "id": 609,
+            "subject": "체육",
+            "startTime": "09:50",
+            "endTime": "10:30",
+            "day": "월"
+        },
+        {
+            "id": 610,
+            "subject": "과학",
+            "startTime": "10:40",
+            "endTime": "11:20",
+            "day": "월"
+        },
+	    ...
+    ]
+}
+FAIL{
+    "code": 404, "message": "해당하는 수업이 없습니다."
+}
+```
+
+### 오늘 시간표 보기
+
+- URL
+  - Date에 시간표를 보고싶은 날짜를 주세요.
+
+```
+GET /timetable/today?<string:school>&<int:grade>&<int:classes>&<date:date>
+```
+
+- Request
+
+
+```
+X
+```
+
+- Response
+
+``` json
+SUCCESS{
+    [
+        {
+            "id": 608,
+            "subject": "국어",
+            "startTime": "09:00",
+            "endTime": "09:40",
+            "day": "월"
+        },
+        {
+            "id": 609,
+            "subject": "체육",
+            "startTime": "09:50",
+            "endTime": "10:30",
+            "day": "월"
+        },
+        {
+            "id": 610,
+            "subject": "과학",
+            "startTime": "10:40",
+            "endTime": "11:20",
+            "day": "월"
+        },
+    	...
+    ]
+}
+FAIL{
+    "code": 404, "message": "해당하는 수업이 없습니다."
+}
+```
+
+### 일주일 시간표 만들기
+
+###### 참고
+
+- 시간이 겹치는 부분 / 종료시간이 시작시간보다 뒤일 경우에 대한 처리는 안했습니다.
+
+- URL
+
+```
+POST /timetable/week
+```
+
+- Request
+  - **JSON으로 보내주세요**
+  - year : 연도, week : 해당 연도의 몇주차인지
+  - start_time, end_time : 시:분 (시는 0-24로 써주세요 / **00:00 이 형식 꼭 지켜주셔야 합니다!** / 초는 무조건 0으로 들어갑니다)
+
+```JSON
+{
+	"year" : 2022,
+	"week" : 8,
+	"school" : "싸피초등학교",
+	"grade" : 1,
+	"classes" : 1,
+	"1" : [
+					{
+						"subject": "국어",
+						"start_time" : "09:00",
+						"end_time" : "09:40"
+					},
+			],
+	"2" : [
+					{
+						"subject": "사회",
+						"start_time" : "09:00",
+						"end_time" : "09:40"
+					},
+					{
+						"subject": "과학",
+						"start_time" : "09:50",
+						"end_time" : "10:30"
+					}		
+			],
+	"3" : [],
+	"4" : [],
+	"5" : [
+					{
+						"subject": "음악",
+						"start_time" : "09:00",
+						"end_time" : "09:40"
+					}
+			]
+}
+```
+
+- Response
+
+``` json
+SUCCESS{
+    "code": 200, "message": "Ok",
+}
+```
+
+### 일주일 시간표 수정
+
+- URL
+
+```
+PUT /timetable/week
+```
+
+- Request
+  - **JSON으로 보내주세요**
+  - year : 연도, week : 해당 연도의 몇주차인지
+  - start_time, end_time : 시:분 (시는 0-24로 써주세요 / **00:00 이 형식 꼭 지켜주셔야 합니다!** / 초는 무조건 0으로 들어갑니다)
+
+```JSON
+{
+	"year" : 2022,
+	"week" : 8,
+	"school" : "싸피초등학교",
+	"grade" : 1,
+	"classes" : 1,
+	"1" : [
+					{
+						"subject": "국어",
+						"start_time" : "09:00",
+						"end_time" : "09:40"
+					},
+			],
+	"2" : [
+					{
+						"subject": "사회",
+						"start_time" : "09:00",
+						"end_time" : "09:40"
+					},
+					{
+						"subject": "과학",
+						"start_time" : "09:50",
+						"end_time" : "10:30"
+					}		
+			],
+	"3" : [],
+	"4" : [],
+	"5" : [
+					{
+						"subject": "음악",
+						"start_time" : "09:00",
+						"end_time" : "09:40"
+					}
+			]
+}
+```
+
+- Response
+
+``` json
+SUCCESS{
+    "code": 200, "message": "Ok",
+}
+```
+
+---
+
+### 게시판
+
 ### 반
+
 ### 반 게시판 전체 목록
+
 - URL
+
 ```
-GET /board/class/<string:school>&<int:grade>&<int:class>
+GET /board/class?<string:school>&<int:grade>&<int:classes>&<int:page>&<int:size>
 ```
+
 - Request
+
 ```
 X
 ```
+
 - Response
+
 ``` json
-SUCCESS{
-    "code": 200, "message": "Success",
-    "data":[
-        {
-            "id":"INT",
-            "category":"String",
-            "title":"String",
-            "writer":"String",
-            "date":"DATETIME",
-            "viewCount":"INT"
-        }
-    ]
-}
-FAIL{
-    "code": 500, "message": "Server Error",
-    "code": 401, "message": "해당하는 학교 또는 반이 없습니다."
+{
+	"content": [
+		{
+			"id": 332,
+			"category": "question",
+			"title": "박윤지의 질문",
+			"content": "",
+			"user": {
+				"id": 67,
+				"name": "박윤지",
+				"position": "S",
+				"school": "싸피초등학교",
+				"grade": 1,
+				"classes": 1,
+				"number": 6,
+				"userId": "ssafy4",
+				"email": "ssafy4@ggg.com",
+				"password": "$2a$10$6nrhXa/hk0V8kxlGktvkEOTkDiuTUvkL7PAoU8BQxhTsDGgSgo9pS",
+				"birth": "2022-02-17"
+			},
+			"school": "싸피초등학교",
+			"grade": 1,
+			"classes": 1,
+			"date": "2022-02-18 00:30:10",
+			"viewcount": 2
+		},
+		{
+			"id": 331,
+			"category": "notice",
+			"title": "2월 20일 알림장",
+			"content": "1. 수수께끼 풀어오세요~\r\n2. 주말에 재밌게 놀고오기^^",
+			"user": {
+				"id": 64,
+				"name": "이상백",
+				"position": "T",
+				"school": "싸피초등학교",
+				"grade": 1,
+				"classes": 1,
+				"number": 0,
+				"userId": "ssafy1",
+				"email": "ssafy1@ggg.com",
+				"password": "$2a$10$JhOk0tpCrKi1i508NEE2w.CGf9JHtJjf5X91KCMvePsgmMtHAekYa",
+				"birth": "2022-02-17"
+			},
+			"school": "싸피초등학교",
+			"grade": 1,
+			"classes": 1,
+			"date": "2022-02-18 00:24:00",
+			"viewcount": 31
+		},
+        ...
+	],
+	"pageable": {
+		"sort": {
+			"sorted": false,
+			"unsorted": true,
+			"empty": true
+		},
+		"pageNumber": 1,
+		"pageSize": 5,
+		"offset": 5,
+		"paged": true,
+		"unpaged": false
+	},
+	"last": false,
+	"totalPages": 3,
+	"totalElements": 14,
+	"first": false,
+	"numberOfElements": 5,
+	"size": 5,
+	"number": 1,
+	"sort": {
+		"sorted": false,
+		"unsorted": true,
+		"empty": true
+	},
+	"empty": false
 }
 ```
-### 반 게시판 카테고리글
+
+### 반 게시판 카테고리글 목록
+
 - URL
+
 ```
-GET /board/class/<string:school><string:category>&<int:grade>&<int:class>
+GET /board/class/category?<string:school>&<int:grade>&<int:classes>&<string:category>&<int:page>&<int:size>
 ```
+
 - Request
+
 ```
+X
 ```
 
 - Response
+
 ``` json
-SUCCESS{
-    "code":200, "message": "Success",
-    "id": "INT",
-    "category":"String",
-    "title":"String",
-    "writer":"String",
-    "date":"DATETIME",
-    "viewCount":"INT"
-}
-FAIL{
-    "code": 500, "message": "Server Error",
-    "code": 401, "message": "해당하는 글이 없습니다."
+{
+	"content": [
+		{
+			"id": 337,
+			"category": "assignment",
+			"title": "오늘의 수학 숙제",
+			"content": "1부터 20까지 숫자 쓰기 연습을 해보세요.",
+			"user": {
+				"id": 64,
+				"name": "이상백",
+				"position": "T",
+				"school": "싸피초등학교",
+				"grade": 1,
+				"classes": 1,
+				"number": 0,
+				"userId": "ssafy1",
+				"email": "ssafy1@ggg.com",
+				"password": "$2a$10$JhOk0tpCrKi1i508NEE2w.CGf9JHtJjf5X91KCMvePsgmMtHAekYa",
+				"birth": "2022-02-17"
+			},
+			"school": "싸피초등학교",
+			"grade": 1,
+			"classes": 1,
+			"date": "2022-02-18 10:27:03",
+			"viewcount": 18
+		},
+		{
+			"id": 323,
+			"category": "assignment",
+			"title": "글씨 예쁘게 써오기",
+			"content": "아래 단어들을 예쁘게 써와주세요~!\r\n1. 구름\r\n2. 바다\r\n3. 사랑\r\n4. 무지개",
+			"user": {
+				"id": 64,
+				"name": "이상백",
+				"position": "T",
+				"school": "싸피초등학교",
+				"grade": 1,
+				"classes": 1,
+				"number": 0,
+				"userId": "ssafy1",
+				"email": "ssafy1@ggg.com",
+				"password": "$2a$10$JhOk0tpCrKi1i508NEE2w.CGf9JHtJjf5X91KCMvePsgmMtHAekYa",
+				"birth": "2022-02-17"
+			},
+			"school": "싸피초등학교",
+			"grade": 1,
+			"classes": 1,
+			"date": "2022-02-18 00:12:27",
+			"viewcount": 46
+		},
+        ...
+	],
+	"pageable": {
+		"sort": {
+			"sorted": false,
+			"unsorted": true,
+			"empty": true
+		},
+		"pageNumber": 0,
+		"pageSize": 5,
+		"offset": 0,
+		"paged": true,
+		"unpaged": false
+	},
+	"last": true,
+	"totalPages": 1,
+	"totalElements": 2,
+	"first": true,
+	"numberOfElements": 2,
+	"size": 5,
+	"number": 0,
+	"sort": {
+		"sorted": false,
+		"unsorted": true,
+		"empty": true
+	},
+	"empty": false
 }
 ```
+
+### 반 게시판 카테고리, 유저로 조회
+
+- URL
+
+```
+GET /board/class/category/user?<string:school>&<int:grade>&<int:classes>&<string:category>&<string:userId>&<int:page>&<int:size>
+```
+
+- Request
+
+```
+X
+```
+
+- Response
+
+``` json
+{
+	"content": [
+		{
+			"id": 332,
+			"category": "question",
+			"title": "박윤지의 질문",
+			"content": "",
+			"user": {
+				"id": 67,
+				"name": "박윤지",
+				"position": "S",
+				"school": "싸피초등학교",
+				"grade": 1,
+				"classes": 1,
+				"number": 6,
+				"userId": "ssafy4",
+				"email": "ssafy4@ggg.com",
+				"password": "$2a$10$6nrhXa/hk0V8kxlGktvkEOTkDiuTUvkL7PAoU8BQxhTsDGgSgo9pS",
+				"birth": "2022-02-17"
+			},
+			"school": "싸피초등학교",
+			"grade": 1,
+			"classes": 1,
+			"date": "2022-02-18 00:30:10",
+			"viewcount": 2
+		},
+        ...
+	],
+	"pageable": {
+		"sort": {
+			"sorted": false,
+			"unsorted": true,
+			"empty": true
+		},
+		"pageNumber": 0,
+		"pageSize": 5,
+		"offset": 0,
+		"paged": true,
+		"unpaged": false
+	},
+	"last": true,
+	"totalPages": 1,
+	"totalElements": 1,
+	"first": true,
+	"numberOfElements": 1,
+	"size": 5,
+	"number": 0,
+	"sort": {
+		"sorted": false,
+		"unsorted": true,
+		"empty": true
+	},
+	"empty": false
+}
+```
+
 ### 반 게시판 글 상세
+
 - URL
+  - 숙제게시판을 호출할 때만 `userId`파라미터가 들어갑니다. 다른 게시판은 보내지 않습니다.
+
 ```
-GET /board/class/detail/<string:school>&<int:grade>&<int:class>&<int:id>
+(숙제게시판) GET /board/class/detail?<string:school>&<int:grade>&<int:classes>&<int:id>&<String:userId>
+(다른게시판) GET /board/class/detail?<string:school>&<int:grade>&<int:classes>&<int:id>
 ```
+
 - Request
+
 ```
+X
 ```
 
 - Response
+  - 파일, 댓글, 글정보 같이감
+
 ``` json
-SUCCESS{
-    "code":200, "message": "Success",
-    "id":"INT",
-    "category":"String",
-    "title":"String",
-    "content":"String",
-    "writer":"String",
-    "school":"String",
-    "grade":"INT",
-    "classes":"INT",
-    "date":"DATETIME",
-    "file_link":"String",
-    "viewCount":"INT"
-}
-FAIL{
-    "code": 500, "message": "Server Error",
-    "code": 401, "message": "해당하는 글이 없습니다."
+{
+	"comments": [
+		{
+			"id": 108,
+			"createdAt": "2022-02-18 00:29:09",
+			"content": "",
+			"parent_id": 0,
+			"user": {
+				"id": 67,
+				"name": "박윤지",
+				"position": "S",
+				"school": "싸피초등학교",
+				"grade": 1,
+				"classes": 1,
+				"number": 6,
+				"userId": "ssafy4",
+				"email": "ssafy4@ggg.com",
+				"password": "$2a$10$6nrhXa/hk0V8kxlGktvkEOTkDiuTUvkL7PAoU8BQxhTsDGgSgo9pS",
+				"birth": "2022-02-17"
+			}
+		},
+		{
+			"id": 110,
+			"createdAt": "2022-02-18 00:31:40",
+			"content": "",
+			"parent_id": 0,
+			"user": {
+				"id": 68,
+				"name": "권영현",
+				"position": "S",
+				"school": "싸피초등학교",
+				"grade": 1,
+				"classes": 1,
+				"number": 4,
+				"userId": "ssafy5",
+				"email": "ssafy5@ggg.com",
+				"password": "$2a$10$JLI8qO/Fs3dDZMhc6QUjbO1sHNph7oRScTRYYxDoKKvz8pl5osI5.",
+				"birth": "2022-02-17"
+			}
+		},
+		...
+	],
+	"files": [
+		{
+			"id": 189,
+			"boardId": 323,
+			"commentId": 108,
+			"original_file_name": "박윤지의 숙제",
+			"stored_file_path": "images/20220217/2127312029666292.jpg",
+			"file_size": 49789,
+			"isDeleted": "N"
+		},
+		{
+			"id": 193,
+			"boardId": 323,
+			"commentId": 110,
+			"original_file_name": "권영현의 숙제",
+			"stored_file_path": "images/20220217/2127463399972254.jpg",
+			"file_size": 48386,
+			"isDeleted": "N"
+		},
+		...
+	],
+	"board": {
+		"id": 323,
+		"category": "assignment",
+		"title": "글씨 예쁘게 써오기",
+		"content": "아래 단어들을 예쁘게 써와주세요~!\r\n1. 구름\r\n2. 바다\r\n3. 사랑\r\n4. 무지개",
+		"user": {
+			"id": 64,
+			"name": "이상백",
+			"position": "T",
+			"school": "싸피초등학교",
+			"grade": 1,
+			"classes": 1,
+			"number": 0,
+			"userId": "ssafy1",
+			"email": "ssafy1@ggg.com",
+			"password": "$2a$10$JhOk0tpCrKi1i508NEE2w.CGf9JHtJjf5X91KCMvePsgmMtHAekYa",
+			"birth": "2022-02-17"
+		},
+		"school": "싸피초등학교",
+		"grade": 1,
+		"classes": 1,
+		"date": "2022-02-18 00:12:27",
+		"viewcount": 48
+	}
 }
 ```
+
 ### 반 게시판 글 작성
+
 - URL
+  - files는 보내지않거나, 다수 보내셔도 됩니다.
+
 ```
-POST /board/class
+POST /board/class?<string:category>&<string:title>&<string:content>&<string:school>&<int:grade>&<int:classes>&<string:userId>&<files:multipartfile>
 ```
+
 - Request
+
 ```json
-{
-    "category":"String",
-    "school":"String",
-    "title":"String",
-    "date":"DATE",
-    "grade":"INT",
-    "classes":"INT",
-    "writer":"String",
-    "content":"String",
-    "file_link":"String",
-}
+X
 ```
+
 - Response
+
 ``` json
 SUCCESS{
-    "code":200,"message":"Success",
-}
-FAIL{
-    "code": 500, "message": "Server Error",
-    "code": 401, "message": "글 작성 오류"
+    "code":200,
 }
 ```
+
 ### 반 게시판 글 수정
+
 - URL
+  - fileIsChanged 꼭 보내셔야 하며 file 변화가 있을 때 "Y" 로 보냅니다.
+  - files는 보내지않거나, 다수 보내셔도 됩니다.
+
 ```
-PUT /board/class
+PUT /board/class?<int:id>&<string:category>&<string:title>&<string:content>&<string:school>&<int:grade>&<int:classes>&<string:fileIsChanged>&<files:multipartfile>
 ```
+
 - Request
+
+
+```json
+X
+```
+
+- Response
+
+``` json
+{
+	"id": 119,
+	"category": "테스트",
+	"title": "글수정~~",
+	"content": "게시판 내용 테스트 수정2",
+	"user": {
+		"id": 1,
+		"name": "권영현",
+		"position": "A",
+		"school": "천안초등학교",
+		"grade": 6,
+		"classes": 8,
+		"number": 1012345678,
+		"userId": "yunghun97",
+		"email": "yunghun97@naver.com",
+		"password": "password97",
+		"birth": "1997-01-05"
+	},
+	"school": "싸피초",
+	"grade": 1,
+	"classes": 1,
+	"date": "2022-02-08 14:22:49",
+	"viewcount": 1
+}
+```
+
+### 반 게시판 글 삭제
+
+- URL
+  - id는 board_id 입니다.
+
+```
+DELETE /board/class?<string:school>&<int:grade>&<int:classes>&<int:id>
+```
+
+- Request
+
+```json
+X
+```
+
+- Response
+
+``` json
+SUCCESS{
+    "code":200,"message":"OK",
+}
+```
+
+### 공지사항
+
+### 공지사항 전체 목록
+
+- URL
+
+```
+GET /board/notice?<int:page>&<int:size>&<string:sort>
+```
+
+- Request
+
+```
+X
+```
+
+- Response
+
+  - content 안에 게시물 객체들이 들어있고
+  - totalPages 가 전체 페이지 수입니다
+
 ```json
 {
-    "id":"INT",
-    "category":"String",
-    "school":"String",
-    "title":"String",
-    "date":"DATE",
-    "grade":"INT",
-    "classes":"INT",
-    "writer":"String",
-    "content":"String",
-    "file_link":"String",
+	"content": [
+		{
+			"id": 1,
+			"title": "첫 공지사항",
+			"content": "지켜",
+			"user": {
+				"id": 4,
+				"name": "ㅁㄴㅇ",
+				"position": "S",
+				"school": "샘머리 초등학교",
+				"grade": 3,
+				"classes": 0,
+				"number": 0,
+				"userId": "id",
+				"email": "ss@na.cm",
+				"password": "$2a$10$by7/xTlAMLX4ETwXrP6fZ.WjU1j6rTOk.oi5L16wbo99ZeBmPPuIa",
+				"birth": null
+			},
+			"date": "2022-02-13 22:14:33",
+			"viewcount": 0
+		},
+        ...
+	],
+	"pageable": {
+		"sort": {
+			"empty": false,
+			"sorted": true,
+			"unsorted": false
+		},
+		"offset": 5,
+		"pageNumber": 1,
+		"pageSize": 5,
+		"paged": true,
+		"unpaged": false
+	},
+	"last": true,
+	"totalPages": 2,
+	"totalElements": 6,
+	"size": 5,
+	"number": 1,
+	"sort": {
+		"empty": false,
+		"sorted": true,
+		"unsorted": false
+	},
+	"first": false,
+	"numberOfElements": 1,
+	"empty": false
 }
 ```
+
+### 공지사항 글 작성
+
+- URL
+  - files는 보내지않거나, 다수 보내셔도 됩니다.
+
+```
+POST /board/notice?<string:title>&<string:content>&<string:userId>&<multipartfile:files>
+```
+
+- Request
+
+```
+X
+```
+
 - Response
+
 ``` json
 SUCCESS{
-    "code":200,"message":"Success",
-    "school":"String",
-    "grade":"INT",
-    "classes":"INT",
-    "id":"INT"    
-}
-FAIL{
-    "code": 500, "message": "Server Error",
-    "code": 401, "message": "글 수정 오류"
+    "code":200,
 }
 ```
-### 반 게시판 글 삭제
+
+### 공지사항 글 수정
+
 - URL
+  - files는 보내지않거나, 다수 보내셔도 됩니다.
+
 ```
-DELETE /board/class/<string:school>&<int:grade>&<int:class>&<int:id>
+PUT /board/notice?<string:title>&<string:content>&<multipartfile:files>
 ```
+
 - Request
+
 ```json
 X
 ```
+
 - Response
+
+``` json
+{
+	"id": 3,
+	"title": "공지사항",
+	"content": "지켜",
+	"user": {
+		"id": 4,
+		"name": "ㅁㄴㅇ",
+		"position": "S",
+		"school": "샘머리 초등학교",
+		"grade": 3,
+		"classes": 0,
+		"number": 0,
+		"userId": "id",
+		"email": "ss@na.cm",
+		"password": "$2a$10$by7/xTlAMLX4ETwXrP6fZ.WjU1j6rTOk.oi5L16wbo99ZeBmPPuIa",
+		"birth": null
+	},
+	"date": "2022-02-13 22:18:21",
+	"viewcount": 1
+}
+```
+
+### 공지사항 글 삭제
+
+- URL
+
+```
+DELETE /board/notice/{noticeId}
+```
+
+- Request
+
+```json
+X
+```
+
+- Response
+
 ``` json
 SUCCESS{
-    "code":200,"message":"Success",
-}
-FAIL{
-    "code": 500, "message": "Server Error",
-    "code": 401, "message": "글 삭제 오류"
+    "code":200,"message":"OK",
 }
 ```
-## 반 댓글
-### 반 게시판 댓글 가져오기
+
+### 공지사항 글 상세
+
 - URL
+
 ```
-GET /board/class/comment/<string:school>&<int:grade>&<int:class>
+GET /board/notice/{noticeId}
 ```
+
 - Request
+
 ```
 X
 ```
+
 - Response
+  - 파일, 글정보 같이감
+
 ``` json
-SUCCESS{
-    "code": 200, "message": "Success",
-    "data":[
-        {
-            "id":"INT",
-            "board_id":"INT",
-            "content": "String",
-            "writer": "String",
-            "file_link": "String"         
-        }
+{
+	"files": [
+		{
+			"id": 2,
+			"noticeId": 3,
+			"original_file_name": "프레젠테이션1.pptx",
+			"stored_file_path": "etc/20220213/160511547434300.pptx",
+			"file_size": 30451,
+			"isDeleted": "N"
+		},
+		{
+			"id": 3,
+			"noticeId": 3,
+			"original_file_name": "candy.txt",
+			"stored_file_path": "etc/20220213/160511548508800.txt",
+			"file_size": 5,
+			"isDeleted": "N"
+		}
+	],
+	"board": {
+		"id": 3,
+		"title": "공지사항",
+		"content": "지켜",
+		"user": {
+			"id": 4,
+			"name": "ㅁㄴㅇ",
+			"position": "S",
+			"school": "샘머리 초등학교",
+			"grade": 3,
+			"classes": 0,
+			"number": 0,
+			"userId": "id",
+			"email": "ss@na.cm",
+			"password": "$2a$10$by7/xTlAMLX4ETwXrP6fZ.WjU1j6rTOk.oi5L16wbo99ZeBmPPuIa",
+			"birth": null
+		},
+		"date": "2022-02-13 22:18:21",
+		"viewcount": 0
+	}
+}
+```
+
+## 반 댓글
+
+### 반 게시판 댓글 가져오기
+
+- URL
+
+```
+GET /board/class/{boardId}/comment
+```
+
+- Request
+
+```
+X
+```
+
+- Response
+
+``` json
+{
+	"comments": [
+		{
+			"id": 45,
+			"createdAt": "2022-02-13 19:50:09",
+			"content": "",
+			"parent_id": 0,
+			"user": {
+				"id": 11,
+				"name": "박싸피",
+				"position": "T",
+				"school": "노형 초등학교",
+				"grade": 1,
+				"classes": 1,
+				"number": 0,
+				"userId": "parkssafy",
+				"email": "parkssafy@email.com",
+				"password": "$2a$10$NZpEAgqvqc89B/WTslQZLO46YPqZQXJjJjq1Eg9JBGqmtb2E/pJRy",
+				"birth": "1999-01-09"
+			}
+		},
+		{
+			"id": 53,
+			"createdAt": "2022-02-13 21:17:51",
+			"content": "참 잘했어요!",
+			"parent_id": 45,
+			"user": {
+				"id": 11,
+				"name": "박싸피",
+				"position": "T",
+				"school": "노형 초등학교",
+				"grade": 1,
+				"classes": 1,
+				"number": 0,
+				"userId": "parkssafy",
+				"email": "parkssafy@email.com",
+				"password": "$2a$10$NZpEAgqvqc89B/WTslQZLO46YPqZQXJjJjq1Eg9JBGqmtb2E/pJRy",
+				"birth": "1999-01-09"
+			}
+		},
+        ...
     ]
 }
-FAIL{
-    "code": 500, "message": "Server Error",
-    "code": 401, "message": "해당하는 댓글이 없습니다."
-}
 ```
+
 ### 반 게시판 댓글 작성
+
 - URL
+  - userId : 로그인한 유저의 아이디
+  - content : 댓글 내용
+  - parent_id : 대댓글일 때, 부모 댓글의 pk
+  - files : 보내지않거나, 다수 보내셔도 됩니다.
+  - 대댓글  작성할 때 (`parent_id` 꼭 빼야합니다)
+
 ```
-POST /board/class/comment
+(댓글 작성시) POST /board/class/{boardId}/comment?<string:userId>&<string:content>&<int:parent_id>&<multipartfile:files>
+(대댓글 작성시) POST /board/class/{boardId}/comment?<string:userId>&<string:content>&<multipartfile:files>
 ```
+
 - Request
-```json
-{
-    "board_id":"INT",
-    "content": "String",
-    "writer": "String",
-    "file_link": "String"
-}
-```
-- Response
-``` json
-SUCCESS{
-    "code": 200, "message": "Success",
-}
-FAIL{
-    "code": 500, "message": "Server Error",
-    "code": 401, "message": "댓글 작성 실패."
-}
-```
-### 반 게시판 댓글 수정
-- URL
-```
-PUT /board/class/comment
-```
-- Request
-```json
-{
-    "id":"INT",
-    "board_id":"INT",    
-    "content": "String",
-    "writer": "String",
-    "file_link": "String",
-}
-```
-- Response
-``` json
-SUCCESS{
-    "code": 200, "message": "Success",
-}
-FAIL{
-    "code": 500, "message": "Server Error",
-    "code": 401, "message": "댓글 수정 실패"
-}
-```
-### 반 게시판 댓글 삭제
-- URL
-```
-DELETE /board/class/comment/<INT:id>
-```
-- Request
+
 ```
 X
 ```
+
 - Response
+
 ``` json
 SUCCESS{
-    "code": 200, "message": "Success",
+    "code": 200, "message": "OK",
 }
-FAIL{
-    "code": 500, "message": "Server Error",
-    "code": 401, "message": "댓글 삭제 실패"
+```
+
+### 반 게시판 댓글 수정
+
+- URL
+  - files : 보내지않거나, 다수 보내셔도 됩니다.
+
+```
+PUT /board/class/{boardId}/comment/{commentId}?<string:content>&<multipartfile:files>
+```
+
+- Request
+
+```
+X
+```
+
+- Response
+
+``` json
+{
+	"id": 7,
+	"createdAt": "2022-02-11 20:39:44",
+	"content": "수정한거보이냐고!!!",
+	"parent_id": 3,
+	"user": {
+		"id": 1,
+		"name": "권영현",
+		"position": "A",
+		"school": "천안초등학교",
+		"grade": 6,
+		"classes": 8,
+		"number": 1012345678,
+		"userId": "yunghun97",
+		"email": "yunghun97@naver.com",
+		"password": "password97",
+		"birth": "1997-01-05"
+	}
 }
-```  
+```
+
+### 반 게시판 댓글 삭제
+
+- URL
+  - boardId 정확하게 입력하셔야 합니다
+
+
+```
+DELETE /board/class/{boardId}/comment/{commentId}
+```
+
+- Request
+
+```
+X
+```
+
+- Response
+
+``` json
+SUCCESS{
+    "code": 200, "message": "OK",
+}
+```
+
+### 대댓글 보기 (숙제게시판용)
+
+- URL
+
+```
+GET /board/class/{boardId}/comment/{commentId}
+```
+
+- Request
+
+```
+X
+```
+
+- Response
+
+``` json
+[
+	{
+		"id": 30,
+		"createdAt": "2022-02-13 16:58:25",
+		"content": "댓글",
+		"parent_id": 28,
+		"user": {
+			"id": 1,
+			"name": "권영현",
+			"position": "A",
+			"school": "천안초등학교",
+			"grade": 6,
+			"classes": 8,
+			"number": 1012345678,
+			"userId": "yunghun97",
+			"email": "yunghun97@naver.com",
+			"password": "password97",
+			"birth": "1997-01-05"
+		}
+	},
+	{
+		"id": 31,
+		"createdAt": "2022-02-13 16:58:26",
+		"content": "댓글",
+		"parent_id": 28,
+		"user": {
+			"id": 1,
+			"name": "권영현",
+			"position": "A",
+			"school": "천안초등학교",
+			"grade": 6,
+			"classes": 8,
+			"number": 1012345678,
+			"userId": "yunghun97",
+			"email": "yunghun97@naver.com",
+			"password": "password97",
+			"birth": "1997-01-05"
+		}
+	}
+]
+```
 
 ---
-
-### 공지
-### 공지사항 게시판 목록
-- URL
-```
-GET /board/notice
-```
-- Request
-```
-X
-```
-- Response
-``` json
-SUCCESS{
-    "code": 200, "message": "Success",
-    "data":[
-        {
-            "id":"INT",
-            "category":"String",
-            "title":"String",
-            "writer":"String",
-            "date":"DATETIME",
-            "file_link":"String",
-            "viewCount":"INT"
-        }
-    ]
-}
-FAIL{
-    "code": 500, "message": "Server Error",
-    "code": 401, "message": "링크 에러."
-}
-```
-
-### 공지사항 게시판 글 상세
-- URL
-```
-GET /board/notice/id?<int:id>
-```
-- Request
-```
-X
-```
-
-- Response
-``` json
-SUCCESS{
-    "code":200, "message": "Success",
-    "id":"INT",
-    "category":"String",
-    "title":"String",
-    "content":"String",
-    "writer":"String",
-    "date":"DATETIME",
-    "file_link":"String",
-    "viewCount":"INT"
-}
-FAIL{
-    "code": 500, "message": "Server Error",
-    "code": 401, "message": "해당하는 글이 없습니다."
-}
-```
-### 공지사항 게시판 글 작성
-- URL
-```
-POST /board/notice
-```
-- Request
-```json
-{
-    "category":"String",    
-    "title":"String",
-    "date":"DATE",
-    "grade":"INT",
-    "classes":"INT",
-    "writer":"String",
-    "content":"String",
-    "file_link":"String",
-}
-```
-- Response
-``` json
-SUCCESS{
-    "code":200,"message":"Success",
-}
-FAIL{
-    "code": 500, "message": "Server Error",
-    "code": 401, "message": "글 작성 오류"
-}
-```
-### 공지사항 게시판 글 수정
-- URL
-```
-PUT /board/notice?<int:id>
-```
-- Request
-```json
-{
-    "category":"String",
-    "title":"String",
-    "date":"DATE",
-    "writer":"String",
-    "content":"String",
-    "file_link":"String",    
-}
-```
-- Response
-``` json
-SUCCESS{
-    "code":200,"message":"Success",
-    "id":"INT"    
-}
-FAIL{
-    "code": 500, "message": "Server Error",
-    "code": 401, "message": "글 수정 오류"
-}
-```
-### 공지사항 게시판 글 삭제
-- URL
-```
-DELETE /board/notice?<int:id>
-```
-- Request  
-X
-- Response
-``` json
-SUCCESS{
-    "code":200,"message":"Success",
-}
-FAIL{
-    "code": 500, "message": "Server Error",
-    "code": 401, "message": "글 삭제 오류"
-}
-```  
 
 ## 화상회의  
 ## 공통 HEADERS
@@ -693,8 +1430,8 @@ POST /lecture/connect
     ]
 }
 
-```  
-  
+```
+
 ### 세션 퇴장
 - URL
 ```
@@ -709,7 +1446,7 @@ X
 400
 404
 ```
-  
+
 ### 방 입장 퇴장 기록 가져오기
 - URL
 ```
