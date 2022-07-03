@@ -170,9 +170,9 @@ cp /home/ubuntu/opt/openvidu/certificates/live/경로
 nano application.properties
 
 # SSL 인증 부분 수정
-server.ssl.key-store=classpath:경로 # classpath:{키이름} classpath: src/main/resouces의 경로를 나타낸다. 
-server.ssl.key-store-type=
-server.ssl.key-store-password=  # p12 키 생성하면서 사용한 비밀번호
+server.ssl.key-store=키이름 # classpath:{키이름} classpath: src/main/resouces의 경로를 나타낸다. 
+server.ssl.key-store-type=키종류
+server.ssl.key-store-password=키비밀번호  # p12 키 생성하면서 사용한 비밀번호
 ```
 
 2. 빌드하기
